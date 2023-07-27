@@ -11,7 +11,7 @@ const puppeteer = require('puppeteer');
 
     // go to website
     await page.goto(linkKabum)
-
+    
     // login
     await page.type('.sc-iGgWBj.cnXDzr.inputForm input[type="text"]', 'hankdzn@gmail.com')
     await page.type('.sc-iGgWBj.cnXDzr.inputForm input[type="password"]', 'hamachi21')
@@ -26,23 +26,26 @@ const puppeteer = require('puppeteer');
         // getting frames page
         const frames = page.frames();
         const frame = frames[0];
-
+        
         const divP = '.sc-tagGq.fJAWRj'
-        await frame.waitForSelector('.sc-tagGq.fJAWRj');
         const dentDiv = await frame.$$(divP + ' > div')
         console.log(dentDiv.length)
 
-        // // waiting the products div - using class
-        // await frame.waitForSelector('.sc-jsJBEP.gWKkHv.productInfo > h1');
-        // let productTitle = await frame.$eval('.sc-jsJBEP.gWKkHv.productInfo > h1', el => el.innerText);
-        // console.log(productTitle);
+        await frame.waitForSelector('.sc-jsJBEP.gWKkHv.productInfo > h1');
 
-        await frame.waitForSelector('xpath/' + '//div[@class="sc-jsJBEP gWKkHv productInfo"]/h1')
-        const products = await frame.$$('xpath/' + '//div[@class="sc-jsJBEP gWKkHv productInfo"]/h1')
+        for (let i=1; i<=dentDiv.length; i++) {
+            let searchValue = await frame.$eval('.sc-jsJBEP.gWKkHv.productInfo > h1', el => el.innerText);                            
+            console.log(searchValue);
+        }
 
-        let productTitle = await products[0].evaluate(el => el.innerText);
-        console.log(productTitle);
+        // waiting the products div
+
+        //
+
 
     }
+
+        
+
 
 })()
