@@ -27,22 +27,27 @@ const puppeteer = require('puppeteer');
         const frames = page.frames();
         const frame = frames[0];
 
-        const divP = '.sc-tagGq.fJAWRj'
-        await frame.waitForSelector('.sc-tagGq.fJAWRj');
-        const dentDiv = await frame.$$(divP + ' > div')
-        console.log(dentDiv.length)
-
         // // waiting the products div - using class
+        // const divP = '.sc-tagGq.fJAWRj'
+        // await frame.waitForSelector('.sc-tagGq.fJAWRj');
+        // const dentDiv = await frame.$$(divP + ' > div')
+        // console.log(dentDiv.length)
+
         // await frame.waitForSelector('.sc-jsJBEP.gWKkHv.productInfo > h1');
         // let productTitle = await frame.$eval('.sc-jsJBEP.gWKkHv.productInfo > h1', el => el.innerText);
         // console.log(productTitle);
 
         await frame.waitForSelector('xpath/' + '//div[@class="sc-jsJBEP gWKkHv productInfo"]/h1')
-        const products = await frame.$$('xpath/' + '//div[@class="sc-jsJBEP gWKkHv productInfo"]/h1')
+        const title = await frame.$$('xpath/' + '//div[@class="sc-jsJBEP gWKkHv productInfo"]/h1')
+        const price = await frame.$$('xpath/' + '//div[@class="sc-eeDRCY cJyymn productPrice"]/h1')
 
-        let productTitle = await products[0].evaluate(el => el.innerText);
-        console.log(productTitle);
 
+        for (let i = 0; i < title.length; i++) {
+            let productTitle = await title[i].evaluate(el => el.innerText);
+            let productPrice = await price[i].evaluate(el => el.innerText)
+            console.log(productTitle.slice(0,30));
+            console.log(productPrice);
+        }
     }
 
 })()
