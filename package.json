@@ -1,5 +1,10 @@
 {
   "dependencies": {
+    "axios": "^1.4.0",
+    "json-server": "^0.17.3",
     "puppeteer": "^20.9.0"
+  },
+  "scripts": {
+    "backend": "json-server --watch db.json --port 5000"
   }
 }
