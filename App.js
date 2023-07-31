@@ -47,14 +47,14 @@ require('dotenv').config();
         // getting the all value of fav products price
         const price = await frame.$$('xpath/' + '//div[@class="sc-eeDRCY cJyymn productPrice"]/h1')
 
+        // function to get products from db.json
         async function getDataFromJSONServer(id) {
             try {
-                const response = await axios.get(`http://localhost:5000/products/${id + 1}`);
-                let dado = response.data;
-                return dado
-
+                const response = await axios.get(`http://localhost:5000/products/${id+1}`);
+                let dados = response.data;
+                return dados
             } catch (error) {
-                console.error('Erro ao obter os dados do JSON-Server(GET):', error);
+                console.error('Erro ao obter os dados do JSON-Server:', error);
             }
         }
 
@@ -62,24 +62,29 @@ require('dotenv').config();
         async function sendDataToJSONServer(data) {
             try {
                 await axios.post('http://localhost:5000/products', data);
-
                 console.log('Dados enviados com sucesso para o JSON-Server!');
             } catch (error) {
                 console.error('Erro ao enviar os dados para o JSON-Server:', error);
             }
         }
 
-
-        const productDb = await getDataFromJSONServer()
+        // function to DELETE product from db.json
+        async function deleteDataFromJSONServer(id) {
+            try {
+                await axios.delete(`http://localhost:5000/products/${id+1}`);
+                console.log('Dado deletado.');
+            } catch (error) {
+                console.error('Erro ao deletar o dado do JSON-Server(:', error);
+            }
+        }
 
         // initiating the product array
         let readyProduct = []
 
         // loop over the quantity of products
         for (let i = 0; i < title.length; i++) {
-
+            // getting the product value and attributing to const
             const productDb = await getDataFromJSONServer(i)
-            // getDataFromJSONServer()
             // getting the value of h1 in product title div
             let productTitle = await title[i].evaluate(el => el.innerText);
             // transforming the data
@@ -91,20 +96,17 @@ require('dotenv').config();
             // organizing the data to send to db.json
             readyProduct = { id: i + 1, title: productTitle, price: productPrice }
 
+            // conditional to compare Web Price and DB Price, IF Web Price lower than DB Price...
             if (productPrice < productDb.price) {
-                // sendDataToJSONServer(readyProduct);
                 console.log(`O produto ${productDb.title} está R$ ${productDb.price - productPrice} mais barato.`)
+                // delete the product
+                await deleteDataFromJSONServer(i)
+                // send the new product price
+                await sendDataToJSONServer(readyProduct);
             } else {
-                console.log('Mesmos valores :(')
-                // console.log(readyProduct)
-                // console.log(dbPrice)
+                console.log(`O produto ${productDb.title} não teve diferença no valor.`)
             }
-
-
         }
-
-
-
     }
     await browser.close()
 })()

@@ -1,14 +1,14 @@
 {
   "products": [
     {
-      "id": 1,
-      "title": "Placa Mãe Gigabyte B550M Aorus",
-      "price": 949.99
-    },
-    {
       "id": 2,
       "title": "Processador AMD Ryzen 5 5600 ",
-      "price": 989.99
+      "price": 889.99
+    },
+    {
+      "id": 1,
+      "title": "Placa Mãe Gigabyte B550M Aorus",
+      "price": 799.99
     }
   ]
 }
