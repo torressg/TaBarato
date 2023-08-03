@@ -9,7 +9,7 @@ require('dotenv').config();
     const password = process.env.USER_PASSWORD
 
     // default for puppeteer
-    const browser = await puppeteer.launch({ headless: "new" });
+    const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
 
     // go to website
@@ -101,8 +101,14 @@ require('dotenv').config();
                 productTitle = (productTitle.slice(0, 30)).replace(',', '')
                 // getting the value of h1 in product price div
                 let productPrice = await price[i].evaluate(el => el.innerText)
-                // transforming the data
-                productPrice = parseFloat((productPrice.slice(3, 10)).replace(',', '.'))
+                // condition to thousand prices
+                if (productPrice.length > 9) {
+                    // transforming the data
+                    productPrice = parseFloat(((productPrice.slice(3, 11)).replace(".","")).replace(",","."))
+                } else {
+                    // transforming the data
+                    productPrice = parseFloat((productPrice.slice(3, 10)).replace(',', '.'))
+                }
                 // organizing the data to send to db.json
                 readyProduct = { id: i + 1, title: productTitle, price: productPrice }
                 await sendDataToJSONServer(readyProduct);
@@ -115,8 +121,14 @@ require('dotenv').config();
                 productTitle = (productTitle.slice(0, 30)).replace(',', '')
                 // getting the value of h1 in product price div
                 productPrice = await price[i].evaluate(el => el.innerText)
-                // transforming the data
-                productPrice = parseFloat((productPrice.slice(3, 10)).replace(',', '.'))
+                // condition to thousand prices
+                if (productPrice.length > 9) {
+                    // transforming the data
+                    productPrice = parseFloat(((productPrice.slice(3, 11)).replace(".","")).replace(",","."))
+                } else {
+                    // transforming the data
+                    productPrice = parseFloat((productPrice.slice(3, 10)).replace(',', '.'))
+                }
                 // organizing the data to send to db.json
                 readyProduct = { id: i + 1, title: productTitle, price: productPrice }
                 // condition to compare Web Price and DB Price, IF Web Price lower than DB Price...
@@ -130,14 +142,6 @@ require('dotenv').config();
                     console.log(`O produto ${productDb.title} não teve diferença no valor.`)
                 }
             }
-
-
-
-
-
-
-
-
         }
     }
     await browser.close()

@@ -1,5 +1,19 @@
 {
   "products": [
-
+    {
+      "id": 1,
+      "title": "Console Sony Playstation 5 - 1",
+      "price": 3599.91
+    },
+    {
+      "id": 2,
+      "title": "Placa Mãe Gigabyte B550M Aorus",
+      "price": 849.99
+    },
+    {
+      "id": 3,
+      "title": "Processador AMD Ryzen 5 5600 ",
+      "price": 889.99
+    }
   ]
 }
