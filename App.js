@@ -9,7 +9,7 @@ require('dotenv').config();
     const password = process.env.USER_PASSWORD
 
     // default for puppeteer
-    const browser = await puppeteer.launch({ headless: 'new' });
+    const browser = await puppeteer.launch({ headless: "new" });
     const page = await browser.newPage();
 
     // go to website
@@ -47,10 +47,20 @@ require('dotenv').config();
         // getting the all value of fav products price
         const price = await frame.$$('xpath/' + '//div[@class="sc-eeDRCY cJyymn productPrice"]/h1')
 
+
         // function to get products from db.json
         async function getDataFromJSONServer(id) {
             try {
-                const response = await axios.get(`http://localhost:5000/products/${id+1}`);
+                const response = await axios.get(`http://localhost:5000/products/${id + 1}`);
+                let dados = response.data;
+                return dados
+            } catch (error) {
+                console.error('Erro ao obter os dados do JSON-Server:', error);
+            }
+        }
+        async function checkDataFromJSONServer(id) {
+            try {
+                const response = await axios.get(`http://localhost:5000/products`);
                 let dados = response.data;
                 return dados
             } catch (error) {
@@ -71,7 +81,7 @@ require('dotenv').config();
         // function to DELETE product from db.json
         async function deleteDataFromJSONServer(id) {
             try {
-                await axios.delete(`http://localhost:5000/products/${id+1}`);
+                await axios.delete(`http://localhost:5000/products/${id + 1}`);
                 console.log('Dado deletado.');
             } catch (error) {
                 console.error('Erro ao deletar o dado do JSON-Server(:', error);
@@ -80,32 +90,54 @@ require('dotenv').config();
 
         // initiating the product array
         let readyProduct = []
-
+        let nullDb = await checkDataFromJSONServer()
         // loop over the quantity of products
         for (let i = 0; i < title.length; i++) {
-            // getting the product value and attributing to const
-            const productDb = await getDataFromJSONServer(i)
-            // getting the value of h1 in product title div
-            let productTitle = await title[i].evaluate(el => el.innerText);
-            // transforming the data
-            productTitle = (productTitle.slice(0, 30)).replace(',', '')
-            // getting the value of h1 in product price div
-            let productPrice = await price[i].evaluate(el => el.innerText)
-            // transforming the data
-            productPrice = parseFloat((productPrice.slice(3, 10)).replace(',', '.'))
-            // organizing the data to send to db.json
-            readyProduct = { id: i + 1, title: productTitle, price: productPrice }
-
-            // conditional to compare Web Price and DB Price, IF Web Price lower than DB Price...
-            if (productPrice < productDb.price) {
-                console.log(`O produto ${productDb.title} está R$ ${productDb.price - productPrice} mais barato.`)
-                // delete the product
-                await deleteDataFromJSONServer(i)
-                // send the new product price
+            // condition to DB null
+            if (nullDb.length === 0) {
+                // getting the value of h1 in product title div
+                let productTitle = await title[i].evaluate(el => el.innerText);
+                // transforming the data
+                productTitle = (productTitle.slice(0, 30)).replace(',', '')
+                // getting the value of h1 in product price div
+                let productPrice = await price[i].evaluate(el => el.innerText)
+                // transforming the data
+                productPrice = parseFloat((productPrice.slice(3, 10)).replace(',', '.'))
+                // organizing the data to send to db.json
+                readyProduct = { id: i + 1, title: productTitle, price: productPrice }
                 await sendDataToJSONServer(readyProduct);
+                console.log(`O produto ${readyProduct.title} foi inserido com suscesso.`)
             } else {
-                console.log(`O produto ${productDb.title} não teve diferença no valor.`)
+                const productDb = await getDataFromJSONServer(i)
+                // getting the product value and attributing to const
+                let productTitle = await title[i].evaluate(el => el.innerText);
+                // transforming the data
+                productTitle = (productTitle.slice(0, 30)).replace(',', '')
+                // getting the value of h1 in product price div
+                productPrice = await price[i].evaluate(el => el.innerText)
+                // transforming the data
+                productPrice = parseFloat((productPrice.slice(3, 10)).replace(',', '.'))
+                // organizing the data to send to db.json
+                readyProduct = { id: i + 1, title: productTitle, price: productPrice }
+                // condition to compare Web Price and DB Price, IF Web Price lower than DB Price...
+                if (productPrice < productDb.price) {
+                    console.log(`O produto ${productDb.title} está R$ ${productDb.price - productPrice} mais barato.`)
+                    // delete the product
+                    await deleteDataFromJSONServer(i)
+                    // send the new product price
+                    await sendDataToJSONServer(readyProduct);
+                } else {
+                    console.log(`O produto ${productDb.title} não teve diferença no valor.`)
+                }
             }
+
+
+
+
+
+
+
+
         }
     }
     await browser.close()
