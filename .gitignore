@@ -131,3 +131,6 @@ dist
 
 # test
 Test.js
+cookie-test.js
+cookies.js
+cookies.json

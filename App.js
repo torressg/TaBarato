@@ -4,20 +4,25 @@ require('dotenv').config();
 
 (async () => {
     // link Website
-    const linkKabum = 'https://www.kabum.com.br/login?redirect_uri=https://www.kabum.com.br/minha-conta/favoritos'
+    const linkKabum = 'https://www.kabum.com.br/minha-conta/favoritos'
     const email = process.env.USER_EMAIL
     const password = process.env.USER_PASSWORD
 
     // default for puppeteer
     const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
+    const cookiesString = await fs.readFile("./cookies.json");
+    const cookies = JSON.parse(cookiesString);
+    await page.setCookie(...cookies);
 
     // go to website
-    await page.goto(linkKabum)
+    await page.goto(linkKabum, {
+        waitUntil: "networkidle2",
+    })
 
     // login
-    await page.type('.sc-iGgWBj.cnXDzr.inputForm input[type="text"]', email)
-    await page.type('.sc-iGgWBj.cnXDzr.inputForm input[type="password"]', password)
+    await page.type('#login', email)
+    await page.type('#password', password)
     await page.keyboard.press('Tab')
     await page.keyboard.press('Enter')
 
@@ -104,7 +109,7 @@ require('dotenv').config();
                 // condition to thousand prices
                 if (productPrice.length > 9) {
                     // transforming the data
-                    productPrice = parseFloat(((productPrice.slice(3, 11)).replace(".","")).replace(",","."))
+                    productPrice = parseFloat(((productPrice.slice(3, 11)).replace(".", "")).replace(",", "."))
                 } else {
                     // transforming the data
                     productPrice = parseFloat((productPrice.slice(3, 10)).replace(',', '.'))
@@ -124,7 +129,7 @@ require('dotenv').config();
                 // condition to thousand prices
                 if (productPrice.length > 9) {
                     // transforming the data
-                    productPrice = parseFloat(((productPrice.slice(3, 11)).replace(".","")).replace(",","."))
+                    productPrice = parseFloat(((productPrice.slice(3, 11)).replace(".", "")).replace(",", "."))
                 } else {
                     // transforming the data
                     productPrice = parseFloat((productPrice.slice(3, 10)).replace(',', '.'))
